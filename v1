@@ -1,0 +1,99 @@
+#include <kipr/botball.h>
+int FrontLeft = 1;
+int FrontRight = 0;
+int BackLeft = 2;
+int BackRight = 3;
+double bias = 0.00;
+int speed = 100;
+double theta = 0.00;
+void calibrate_gyro()
+{
+    int i = 0;
+    double avg = 0.00;
+    while(i < 50)
+    {
+        avg += gyro_z();
+        msleep(5);
+        i++;
+    }
+    bias = avg / 50.0;
+    printf("New Bias: %f\n", bias);
+}
+
+void simple_drive_with_gyro(int speed, double time)
+{
+    double startTime = seconds();
+    double theta = 0.00;
+    while(seconds() - startTime < time)
+    {
+        if(theta < 1000 && theta > -1000)
+        {
+            mav(FrontLeft, speed);
+            mav(FrontRight, speed * -1);
+            mav(BackLeft, speed);
+            mav(BackRight, speed * -1);
+        }
+        else if(theta < 1000)
+        {
+            mav(FrontLeft, speed - 100);
+            mav(FrontRight, (speed + 100)*-1);
+            mav(BackLeft, speed - 100);
+            mav(BackRight, (speed + 100)*-1);
+        }
+        else
+        {
+            mav(FrontLeft, speed + 100);
+            mav(FrontRight, (speed - 100)*-1);
+            mav(BackLeft, speed + 100);
+            mav(BackRight, (speed - 100)*-1);
+        }
+        msleep(10);
+        theta += (gyro_z() - bias) * 10;
+    }
+}
+
+int main()
+{
+    enable_servos();
+    //starting light
+    //wait_for_light(1);
+    //shut_down_in(30);
+    calibrate_gyro();
+    printf("Past cal 1\n");
+	int t = 0;
+    while (t < 1)
+    {
+        while (analog(0) < 2800)
+        {
+            theta += (gyro_z() - bias) * 10;
+            simple_drive_with_gyro(1200, 3.20);
+            printf("New Bias: %f\n", theta);
+            t++;
+        }
+        simple_drive_with_gyro(1200, 0.5);
+    }
+
+    // Move Forward to water
+
+
+    //Pick up first three water
+
+    //pick up 4th-6th water
+
+    //Move to centers
+
+    //Identify burning building
+
+    //Put water on top of burning building
+
+    //Move supplies if needed
+
+    //Go to orange cylinder on right side of board
+
+    //Pick up orange cylinder
+
+    //Place it in zone
+
+    //Go back to starting zone
+    return 0;
+}
