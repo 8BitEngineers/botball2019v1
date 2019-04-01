@@ -1,0 +1,102 @@
+#include <kipr/botball.h>
+#include "GyroCode.h"
+#include "ClawCode.h"
+
+int main()
+{
+    //38
+    int ninety = 113800;
+    int half = ninety * 2;
+    int back = 0;
+    int front = 1;
+    int side = 2;
+    int edge = 3000;
+
+    calibrate_gyro();
+
+    //Incase it starts on black
+    while(analog(back) > 1200)
+    {
+        overblack(400, back);
+    }
+    //Open Claw
+
+    ao();
+    ClawUp();
+    ao();
+    while (analog(back) < 1200)
+    {
+        simple_drive_with_gyro(-400, 0.1);
+
+    }
+   // overblack(400, back);
+    
+
+    ao();
+    printf("past 1");
+    //turn_with_gyro(-240, -240, half);
+    while(analog(side) < 500)
+    {
+        motor(1, -50);
+        motor(0, -50);
+        msleep(1);
+    }
+
+    ao();
+    turn_with_gyro(800, 800, 45000);
+    ClawDown();
+    ao();
+	
+    ClawOpen();
+    ao();
+    simple_drive_with_gyro(600, 3.4);
+    ao();
+    //attempt at putting in box
+    ClawClose();
+    ao();
+    turn_with_gyro(400, 400, 80000);
+    simple_drive_with_gyro(600, 2);
+    ao();
+    ClawOpen();
+    ao();
+    ClawUp();
+    simple_drive_with_gyro(-600, 2);
+    turn_with_gyro(-400, -400, 65000);
+
+    //may need clawup
+    ao();
+    printf("past 2");
+    turn_with_gyro(240, 240, half);
+    ao();
+    //Move backwards to black line, pass over it
+    untilblack(600, front, 1);
+    overblack(600, front);
+
+    //Go to grab first orange
+    findblack(-400, front);
+    untilblack(600, back, 1);
+    overblack(600, back);
+    ao();
+    ClawDown();
+    ao();
+    ClawClose();
+    ao();
+    simple_drive_with_gyro(-800, 1);
+    ao();
+    ClawUp();
+    ao();
+
+    //Grabbed, go to drop off.
+    untilblack(-600, side, 1);
+    findblack(240, front);
+    ao();
+    untilblack(600, side, 1);
+    findblack(400, front);
+    while(analog(front) > 1200)
+    {
+        turn_with_gyro(800, 800, 500);
+    }
+    turn_with_gyro(400, 400, 25000);
+    ao();
+    return 0;
+}
