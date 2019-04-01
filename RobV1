@@ -1,0 +1,49 @@
+38383838#include <kipr/botball.h>
+#include "GyroCode.h"
+#include "ClawCode.h"
+
+int main()
+{
+    //38
+    int ninety = 47000;
+    int half = ninety * 2;
+    //Open Claw
+    ClawOpen(0);
+    //Move backwards to black line
+    BlackCount(-1200, 2);
+    while(analog(2) > 1200)
+    {
+        turn_with_gyro(-240, -240, 10);
+    }
+    printf("Blackcount over");
+    //Turn left 90
+    turn_with_gyro(-240, -240, ninety);
+    while(analog(2) < 1200)
+    {
+        simple_drive_with_gyro(800, 0.2);
+    }
+    while(analog(0) < 1200)
+    {
+        turn_with_gyro(-240, -240, 50);
+    }
+    //Move into position
+    while(analog(2) < 1450)
+    {
+        simple_drive_with_gyro(800, 0.01);
+    }
+
+    simple_drive_with_gyro(1200, 0.6);
+    while(analog(1) < 1450)
+    {
+        turn_with_gyro(-240, -240, 0.11);
+    }
+    ClawDown();
+    ClawClose();
+    msleep(500);
+    //  simple_drive_with_gyro(800, 0.5);
+    ClawUp();
+    simple_drive_with_gyro(-1200, 0.8);
+
+
+    return 0;
+}
