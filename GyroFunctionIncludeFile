@@ -1,0 +1,118 @@
+int FrontLeft = 1;
+int FrontRight = 0;
+double bias = 0.00;
+int speed = 100;
+double theta = 0.00;
+void calibrate_gyro()
+{
+    int i = 0;
+    double avg = 0.00;
+    while(i < 50)
+    {
+        avg += gyro_z();
+        msleep(5);
+        i++;
+    }
+    bias = avg / 50.0;
+    printf("New Bias: %f\n", bias);
+}
+
+void simple_drive_with_gyro(int speed, double time)
+{
+    double startTime = seconds();
+    double theta = 0.00;
+    while(seconds() - startTime < time)
+    {
+        if(theta < 1000 && theta > -1000)
+        {
+            mav(FrontLeft, speed);
+            mav(FrontRight, speed * -1);
+        }
+        else if(theta < 1000)
+        {
+            mav(FrontLeft, speed - 100);
+            mav(FrontRight, (speed + 100) * -1);
+        }
+        else
+        {
+            mav(FrontLeft, speed + 100);
+            mav(FrontRight, (speed - 100) * -1);
+        }
+        printf("New theta: %f\n", theta);
+        msleep(5);
+        theta += (gyro_z() - bias) * 10;
+    }
+}
+void  turn_with_gyro(int left_wheel_speed, int right_wheel_speed, double targetTheta)
+{
+    double theta = 0;
+    mav(FrontRight, right_wheel_speed);
+    mav(FrontLeft, left_wheel_speed);
+
+    while(theta < targetTheta)
+    {
+        msleep(10);
+        theta += abs(gyro_z() - bias) *10;
+    }
+
+    mav(FrontRight, 0);
+    mav(FrontLeft, 0);
+}
+//good number is 1200
+void BlackCount(int direction, int port)
+{
+    double black_count = 0;
+    while (black_count < 2){
+        while (analog(port) < 1450){
+            theta += (gyro_z() - bias) * 10;
+            simple_drive_with_gyro(direction, 0.25);
+            if (analog(port) > 1450){
+                black_count++;
+                printf("black_count=: %f\n", black_count);
+            }
+        }
+        if (black_count > 2){
+            simple_drive_with_gyro(0, 0);
+        }
+    }
+}
+void overblack(int direction, int port)
+{
+    while(analog(port) > 1200)
+    {
+        simple_drive_with_gyro(direction, 0.01);
+    }
+    printf("over_black Over");
+}
+
+void untilblack(int direction, int port, int designated)
+{
+    int count = 0;
+    while(count < designated)
+    {
+        while(analog(port) < 1200)
+        {
+            simple_drive_with_gyro(direction, 0.01);
+        }
+        ao();
+        count++;
+        overblack(direction, port);
+        ao();
+    }
+}  
+
+void findblack(int direction, int port)
+{
+    while(analog(port) < 1200)
+    {
+        turn_with_gyro(direction, direction, 50);
+    }
+}
+
+void findwhite(int direction, int port)
+{
+    while(analog(port) > 1200)
+    {
+        turn_with_gyro(direction, direction, 50);
+    }
+}
