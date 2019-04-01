@@ -1,0 +1,38 @@
+int updown = 2;
+int openclose = 3;
+int stopper = 1;
+void ClawUp()
+{
+    while(digital(stopper) == 0)
+    {
+        motor(updown, 60);
+        msleep(10);
+    }
+}
+
+void ClawDown()
+{
+    motor(updown, -60);
+    msleep(1300);
+}
+void ClawOpen()
+{
+    int counter = 0;
+    while(counter < 3000)
+    {
+        while(digital(0) == 0)
+        {
+            motor(3, -300);
+            msleep(1);
+        }
+        counter++;
+
+    }
+    return;
+}
+
+void ClawClose()
+{
+    motor(3, 300);
+    msleep(8000);
+}
