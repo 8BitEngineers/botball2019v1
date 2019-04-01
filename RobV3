@@ -1,0 +1,80 @@
+#include <kipr/botball.h>
+#include "GyroCode.h"
+#include "ClawCode.h"
+
+int main()
+{
+    //38
+    int ninety = 111800;
+    int half = ninety * 2;
+    int back = 0;
+    int front = 1;
+    int side = 2;
+    int edge = 3000;
+
+
+    //Open Claw
+    calibrate_gyro();
+
+    ClawOpen(0);
+    ao();
+    ClawUp();
+    ao();
+    while (analog(back) < 1200)
+    {
+        simple_drive_with_gyro(-400, 0.1);
+
+    }
+    ao();
+    printf("past");
+    //turn_with_gyro(-240, -240, half);
+    while(analog(2) < 1200)
+    {
+        motor(1, -40);
+        motor(0, -40);
+        msleep(1);
+    }
+    ao();
+    ClawDown();
+	ao();
+    simple_drive_with_gyro(600, 3);
+    ao();
+    ClawClose();
+    ao();
+    ClawUp();
+    ao();
+
+   // turn_with_gyro(240, 240, half);
+    ao();
+    //Move backwards to black line, pass over it
+    BlackCount(-1200, side);
+    ao();
+    overblack(-800, side);
+    ao();
+    //Turn to black line with front sensor
+    while(analog(front) < 1200)
+    {
+        turn_with_gyro(-240, -240, 10);
+    }
+    ao();
+
+    //Turn to black line with side sensor edge=black line edge value
+    while(analog(side) > edge)
+    {
+        turn_with_gyro(-240, -240, 10);
+    }
+    ao();
+    overblack(400, front);
+    ao();
+    untilblack(400, front, 3);
+    ao();
+    ClawDown();
+    ao();
+    ClawClose();
+    ao();
+    simple_drive_with_gyro(-800, 0.4);
+    ao();
+    ClawUp();
+    ao();
+    return 0;
+}
