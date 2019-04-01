@@ -1,0 +1,505 @@
+#include <kipr/botball.h>
+
+double bias = 0.00;
+int speed = 100;
+double theta = 0.00;
+void calibrate_gyro()
+{
+    int i = 0;
+    double avg = 0.00;
+    while(i < 50)
+    {
+        avg += gyro_z();
+        msleep(5);
+        i++;
+    }
+    bias = avg / 50.0;
+    printf("New Bias: %f\n", bias);
+}
+
+int main()
+{
+    create_connect();
+    enable_servos();
+    set_servo_position(0,100);
+
+    //set robot
+
+    create_spin_CCW(20);
+    while (get_create_lbump() != 1)
+    {
+
+    }
+    create_stop();
+    msleep(500);
+    set_create_normalized_angle(0);
+    create_spin_CCW (20);
+    printf("%d",get_create_normalized_angle());
+    while (get_create_normalized_angle() < 15 )
+    {
+        get_create_normalized_angle();
+    }
+    create_stop();
+    msleep(500);
+
+    //move backwards out of starting zone
+
+    create_drive_straight(-200);
+    set_create_distance(250);
+    while (get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+
+    //turn 180
+
+    set_create_normalized_angle(183);
+    create_spin_CW (150);
+    printf("%d",get_create_normalized_angle());
+    while (get_create_normalized_angle() > 0 )
+    {
+        get_create_normalized_angle();
+    }
+
+    //move to first pipe
+
+    create_drive_straight(100);
+    set_create_distance(0);
+    while (get_create_distance() < 515)
+    {
+        get_create_distance(); 
+    }
+
+    //connect pipe
+
+    set_create_normalized_angle(15);
+    create_spin_CW(100);
+    while(get_create_normalized_angle() > 0 )
+    {
+        get_create_normalized_angle();
+    }
+    create_stop();
+    msleep(1000);
+    set_servo_position(0,400);
+    msleep(1000);
+    set_create_normalized_angle(5);
+    create_spin_CW(100);
+    while(get_create_normalized_angle() > 0 )
+    {
+        get_create_normalized_angle();
+    }
+    create_stop();
+    set_create_distance(0);
+    create_drive_straight(150);
+    while(get_create_distance() < 15)
+    {
+        get_create_distance();
+    }
+    set_create_distance(15);
+    create_drive_straight(-150);
+    while(get_create_distance() < 0)
+    {
+        get_create_distance();
+    }
+    create_stop();
+    msleep(1000);
+    set_create_normalized_angle(2);
+    create_spin_CW(100);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    set_create_distance(15);
+    create_drive_straight(-150);
+    while(get_create_distance() < 0)
+    {
+        get_create_distance();
+    }
+
+    //move away from pipe
+
+    set_create_normalized_angle(0);
+    create_spin_CCW (50);
+    while (get_create_normalized_angle() < 21 )
+    {
+        get_create_normalized_angle();
+    }
+    create_stop();
+    set_servo_position(0,100);
+    set_create_normalized_angle(7);
+    create_spin_CW(100);
+    while(get_create_normalized_angle() > 0 );
+    {
+        get_create_normalized_angle();
+    }
+    create_drive_straight(-100);
+    set_create_distance(45);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();   
+    }
+
+    //move to black line
+
+    set_create_normalized_angle(0);
+    create_spin_CCW(100);
+    while(get_create_normalized_angle() < 94 );
+    {
+        get_create_normalized_angle();
+    }
+    create_drive_straight(100);
+    set_create_distance(0);
+    while(get_create_distance() < 325)
+    {
+        get_create_distance();
+    }
+    create_drive_direct(-100,0);
+
+    //spin parrallel to black line
+
+    while(get_create_rfcliff_amt() > 1500)
+    {
+        get_create_rfcliff_amt();
+    }
+
+    //follow line to med center 
+
+    set_create_distance(0);
+    while(get_create_distance() < 1700)
+    {
+        if (get_create_rfcliff_amt() > 1800)
+        {
+            create_drive_direct(25,75);
+            msleep(100);
+        }
+        if (get_create_rfcliff_amt() < 1000)
+        {
+            create_drive_direct(75,25);
+            msleep(100);
+        }
+    }
+
+    //back away from med center
+
+    set_create_distance(200);
+    create_drive_straight(-150);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+    create_stop();
+
+    //set servos
+
+    set_servo_position(0,350);
+    msleep(1000);
+    set_servo_position(0,400);
+    msleep(100);
+    set_servo_position(0,450);
+    msleep(100);
+    set_servo_position(0,500);
+    msleep(100);
+    set_servo_position(0,550);
+    msleep(100);
+
+    //turn and crash into wall
+
+    set_create_normalized_angle(95);
+    create_spin_CW(150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    create_drive_straight(-150);
+    set_create_distance(650);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+
+    //align bot
+
+    create_spin_CCW(40);
+    while (get_create_lbump() != 1)
+    {
+
+    }
+    create_stop();
+
+    //move to fire station
+
+    create_drive_straight(100);
+    while(get_create_rcliff_amt() > 1800)
+    {
+        get_create_rcliff_amt();
+    }
+    create_stop();
+
+    //get fireman 1
+
+    set_create_normalized_angle(50);
+    create_spin_CW(150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    create_stop();
+    set_create_distance(0);
+    create_drive_straight(150);
+    while(get_create_distance() < 90)
+    {
+        get_create_distance();
+    }
+    set_create_normalized_angle(0);
+    create_spin_CCW(75);
+    while(get_create_normalized_angle() < 50)
+    {
+        get_create_normalized_angle();
+    }
+
+    //back away
+
+    set_create_distance(50);
+    create_drive_straight(-150);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+
+    //get fireman 2
+
+    set_create_normalized_angle(35);
+    create_spin_CW(150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    set_create_distance(0);
+    create_drive_straight(150);
+    while(get_create_distance() < 80)
+    {
+        get_create_distance();
+    }
+    set_create_distance(0);
+    create_spin_CCW(75);
+    while(get_create_normalized_angle() < 40)
+    {
+        get_create_normalized_angle();
+    }
+
+    //back away
+
+    create_drive_direct(0,-100);
+    get_create_distance(25);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+    set_create_distance(50);
+    create_drive_straight(-150);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+
+    //get fireman 3
+
+    set_create_normalized_angle(20);
+    create_spin_CW(150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    set_create_distance(0);
+    create_drive_straight(150);
+    while(get_create_distance() < 80)
+    {
+        get_create_distance();
+    }
+    set_create_distance(0);
+    create_spin_CCW(75);
+    while(get_create_normalized_angle() < 40)
+    {
+        get_create_normalized_angle();
+    }
+
+    //back away
+
+    create_drive_direct(0,-100);
+    get_create_distance(25);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+    set_create_distance(50);
+    create_drive_straight(-150);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+
+    //get fireman 4
+
+    set_create_normalized_angle(20);
+    create_spin_CW(150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    set_create_distance(0);
+    create_drive_straight(150);
+    while(get_create_distance() < 85)
+    {
+        get_create_distance();
+    }
+    set_create_distance(0);
+    create_spin_CCW(75);
+    while(get_create_normalized_angle() < 40)
+    {
+        get_create_normalized_angle();
+    }
+
+    //back away
+
+    create_drive_direct(0,-100);
+    get_create_distance(25);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+    set_create_distance(50);
+    create_drive_straight(-150);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+
+    //get fireman 5
+
+    set_create_normalized_angle(20);
+    create_spin_CW(150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    set_create_distance(0);
+    create_drive_straight(150);
+    while(get_create_distance() < 75)
+    {
+        get_create_distance();
+    }
+    set_create_distance(0);
+    create_spin_CCW(75);
+    while(get_create_normalized_angle() < 40)
+    {
+        get_create_normalized_angle();
+    }
+
+    //back away
+    create_drive_direct(0,-100);
+    get_create_distance(25);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+    set_create_distance(70);
+    create_drive_straight(-150);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+
+    //discount double check
+
+    set_create_normalized_angle(10);
+    create_spin_CW(150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    set_create_distance(0);
+    create_drive_straight(150);
+    while(get_create_distance() < 80)
+    {
+        get_create_distance();
+    }
+    set_create_distance(0);
+    create_spin_CCW(75);
+    while(get_create_normalized_angle() < 20)
+    {
+        get_create_normalized_angle();
+    }
+
+    //back away from fire station
+
+    set_create_normalized_angle(40);
+    create_spin_CW(150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    set_create_distance(300);
+    create_drive_straight(-150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_distance();
+    }
+    set_create_normalized_angle(100);
+    create_spin_CW(150);
+    while(get_create_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    set_create_distance(500);
+    create_drive_straight(-150);
+    while(get_create_distance() > 0)
+    {
+        get_create_distance();
+    }
+    create_spin_CW(90);
+    while (get_create_rbump() != 1)
+    {
+
+    }
+    create_stop();
+    //move to black line
+    create_drive_straight(100);
+    while(get_create_rcliff_amt() > 1800)
+    {
+        get_create_rcliff_amt();
+    }
+
+    //turn towards tower
+
+    set_create_normalized_angle(0);
+    create_spin_CCW(150);
+    while( get_create_normalized_angle() < 90)
+    {
+        get_create_normalized_angle();
+    }
+
+    //set servos for first tower
+
+    set_servo_position(0,500);
+
+    //move to first tower
+
+    set_create_distance(0);
+    create_drive_straight(150);
+    while(get_create_distance() < 300)
+    {
+        get_create_distance();
+    }
+    create_stop();
+    set_create_normalized_angle(10);
+    create_spin_CW(150);
+    while(get_craete_normalized_angle() > 0)
+    {
+        get_create_normalized_angle();
+    }
+    motor(0,-80);
+    msleep(9000);
+    
+    set_servo_position(0,0);
+    return 0;
+}
